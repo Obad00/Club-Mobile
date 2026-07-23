@@ -1,28 +1,104 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { buildWhatsappLink } from "../config";
+import { PRODUCTS } from "../data/products";
 
-const HERO_PHONE = "https://images.pexels.com/photos/21854468/pexels-photo-21854468.jpeg?auto=compress&cs=tinysrgb&w=500";
-const HERO_EARBUDS = "https://images.pexels.com/photos/33298188/pexels-photo-33298188.jpeg?auto=compress&cs=tinysrgb&w=380";
-const HERO_FRIDGE = "https://images.pexels.com/photos/9551373/pexels-photo-9551373.jpeg?auto=compress&cs=tinysrgb&w=420";
+const AUTOPLAY_MS = 4600;
+
+function firstImages(category, count = 3) {
+  return PRODUCTS.filter((p) => p.category === category)
+    .slice(0, count)
+    .map((p) => p.image);
+}
+
+function buildSlides() {
+  const promoImages = ["electromenager", "telephones", "accessoires"]
+    .map((cat) => PRODUCTS.find((p) => p.category === cat && p.tag === "PROMO")?.image)
+    .filter(Boolean);
+
+  return [
+    {
+      key: "telephones",
+      eyebrow: "Depuis Ouakam, Dakar",
+      title: (
+        <>
+          Les meilleurs <span className="text-brand-red">téléphones.</span>
+        </>
+      ),
+      text: "Samsung, iPhone, Tecno, Infinix — neufs et reconditionnés, garantis en boutique.",
+      images: firstImages("telephones"),
+    },
+    {
+      key: "electromenager",
+      eyebrow: "Confort à la maison",
+      title: (
+        <>
+          Électroménager <span className="text-brand-red">fiable.</span>
+        </>
+      ),
+      text: "Réfrigérateurs, machines à laver, climatiseurs — au meilleur prix de Dakar.",
+      images: firstImages("electromenager"),
+    },
+    {
+      key: "accessoires",
+      eyebrow: "Petits prix, grand usage",
+      title: (
+        <>
+          Vos accessoires <span className="text-brand-red">du quotidien.</span>
+        </>
+      ),
+      text: "Chargeurs, écouteurs, coques, power banks — toujours en stock.",
+      images: firstImages("accessoires"),
+    },
+    {
+      key: "promo",
+      eyebrow: "Offre limitée",
+      title: (
+        <>
+          La promo <span className="text-brand-red">du moment.</span>
+        </>
+      ),
+      text: "Une sélection de prix réduits chaque semaine — profitez-en avant qu'elle change.",
+      images: promoImages,
+    },
+  ];
+}
 
 export default function Hero() {
+  const slides = useMemo(buildSlides, []);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const slide = slides[index];
+
   return (
     <section className="relative overflow-hidden bg-brand-cream">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-28 grid lg:grid-cols-[1.05fr_1fr] gap-12 items-center">
-        {/* Colonne texte */}
-        <div className="animate-rise">
+      {/* Formes de fond qui dérivent très lentement, pour la profondeur */}
+      <div
+        className="hero-blob absolute -top-24 -right-16 w-[26rem] h-[26rem] rounded-full bg-brand-red/[0.06]"
+        aria-hidden="true"
+      />
+      <div
+        className="hero-blob-slow absolute -bottom-32 -left-20 w-[22rem] h-[22rem] rounded-full bg-brand-ink/[0.05]"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-28 grid lg:grid-cols-[1.05fr_1fr] gap-12 items-center">
+        {/* Colonne texte : change en fondu avec la mise en avant du moment */}
+        <div key={slide.key} className="hero-text-fade">
           <span className="inline-flex items-center gap-1.5 bg-brand-ink text-white text-xs font-semibold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            Depuis Ouakam, Dakar
+            {slide.eyebrow}
           </span>
           <h1 className="mt-5 font-display font-semibold text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.05] text-brand-ink">
-            Le rayon de votre
-            <br />
-            quartier,{" "}
-            <span className="text-brand-red">à portée de main.</span>
+            {slide.title}
           </h1>
           <p className="mt-5 text-base sm:text-lg text-brand-ink/70 max-w-md">
-            Téléphones, électroménager et accessoires — au meilleur prix de
-            Dakar. Commandez en un message, on s'occupe du reste.
+            {slide.text}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
@@ -45,28 +121,60 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Collage produits sur une "étagère" — élément signature */}
-        <div className="relative h-[340px] sm:h-[400px] animate-rise" style={{ animationDelay: "120ms" }} aria-hidden="true">
-          <img
-            src={HERO_FRIDGE}
-            alt=""
-            className="absolute left-0 bottom-16 w-40 sm:w-48 rounded-2xl shadow-2xl object-cover h-52 sm:h-60 -rotate-3"
-          />
-          <img
-            src={HERO_PHONE}
-            alt=""
-            className="absolute right-2 sm:right-6 top-0 w-44 sm:w-52 rounded-2xl shadow-2xl object-cover h-40 sm:h-48 rotate-2"
-          />
-          <img
-            src={HERO_EARBUDS}
-            alt=""
-            className="absolute right-8 sm:right-14 bottom-14 w-32 sm:w-40 rounded-2xl shadow-2xl object-cover h-32 sm:h-40 rotate-6"
-          />
+        {/* Collage produits sur une "étagère" — 3 visuels qui alternent entre
+            les mises en avant, chacun avec un effet Ken Burns continu */}
+        <div
+          className="relative h-[340px] sm:h-[400px] animate-rise"
+          style={{ animationDelay: "120ms" }}
+          aria-hidden="true"
+        >
+          <div className="absolute left-0 bottom-16 w-40 sm:w-48 h-52 sm:h-60 -rotate-3 rounded-2xl overflow-hidden shadow-[0_24px_44px_-16px_rgba(200,16,46,0.4)]">
+            {slides.map((s, i) => (
+              <img
+                key={s.key}
+                src={s.images[0]}
+                alt=""
+                className={`kenburns-a absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                  i === index ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
+          </div>
 
-          {/* Étiquette promo flottante */}
-          <div className="absolute left-4 sm:left-8 top-2 bg-white rounded-xl shadow-xl px-3.5 py-2.5 -rotate-6">
-            <p className="text-[10px] uppercase tracking-wide text-brand-ink/50 font-semibold">Promo</p>
-            <p className="font-display font-semibold text-brand-red text-lg leading-none">-15%</p>
+          <div className="absolute right-2 sm:right-6 top-0 w-44 sm:w-52 h-40 sm:h-48 rotate-2 rounded-2xl overflow-hidden shadow-[0_24px_44px_-16px_rgba(22,19,17,0.35)]">
+            {slides.map((s, i) => (
+              <img
+                key={s.key}
+                src={s.images[1]}
+                alt=""
+                className={`kenburns-b absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                  i === index ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="absolute right-8 sm:right-14 bottom-14 w-32 sm:w-40 h-32 sm:h-40 rotate-6 rounded-2xl overflow-hidden shadow-[0_20px_38px_-14px_rgba(200,16,46,0.4)]">
+            {slides.map((s, i) => (
+              <img
+                key={s.key}
+                src={s.images[2]}
+                alt=""
+                className={`kenburns-c absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                  i === index ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Étiquette promo flottante — légère oscillation continue */}
+          <div className="promo-float absolute left-4 sm:left-8 top-2 bg-white rounded-xl shadow-xl px-3.5 py-2.5">
+            <p className="text-[10px] uppercase tracking-wide text-brand-ink/50 font-semibold">
+              Promo
+            </p>
+            <p className="font-display font-semibold text-brand-red text-lg leading-none">
+              -15%
+            </p>
           </div>
 
           {/* L'étagère : barre pleine sous les produits */}

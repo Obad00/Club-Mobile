@@ -6,7 +6,18 @@ import CategoryFilter from "./components/CategoryFilter";
 import ProductGrid from "./components/ProductGrid";
 import FloatingWhatsApp from "./components/FloatingWhatsApp";
 import Footer from "./components/Footer";
+import MarqueeBanner from "./components/MarqueeBanner";
+import Reveal from "./components/Reveal";
+import VitrineTV from "./components/VitrineTV";
 import { PRODUCTS } from "./data/products";
+
+// Mode vitrine TV : accessible via /vitrine ou ?mode=tv, pensé pour tourner
+// en boucle sans interaction sur un écran de boutique.
+function isTVMode() {
+  const params = new URLSearchParams(window.location.search);
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  return params.get("mode") === "tv" || path === "/vitrine";
+}
 
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("tous");
@@ -17,20 +28,32 @@ export default function App() {
     return PRODUCTS.filter((p) => p.category === activeCategory);
   }, [activeCategory]);
 
+  if (isTVMode()) {
+    return <VitrineTV />;
+  }
+
   return (
     <div className="min-h-screen bg-white font-body text-brand-ink">
       <Header />
+      <MarqueeBanner />
       <Hero />
-      <TrustStrip />
+
+      <Reveal>
+        <TrustStrip />
+      </Reveal>
 
       <CategoryFilter active={activeCategory} onSelect={setActiveCategory} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <ProductGrid products={filteredProducts} />
+        <Reveal>
+          <ProductGrid products={filteredProducts} />
+        </Reveal>
       </main>
 
       <FloatingWhatsApp />
-      <Footer />
+      <Reveal>
+        <Footer />
+      </Reveal>
     </div>
   );
 }

@@ -34,12 +34,240 @@ body {
   animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Apparition douce au scroll (voir components/Reveal.jsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Apparition premium des images produits : zoom-out + fondu (voir
+   hooks/useInView.js, utilisé dans ProductCard et Hero) */
+.img-reveal {
+  opacity: 0;
+  transform: scale(1.1);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.img-reveal-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Hero : carrousel automatique (voir components/Hero.jsx) */
+
+/* Effet Ken Burns continu sur les 3 visuels du collage — décalés en durée
+   et en amplitude pour ne pas paraître synchronisés entre eux */
+@keyframes kenburnsA {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.09) translate(-2%, 1%);
+  }
+}
+@keyframes kenburnsB {
+  0%,
+  100% {
+    transform: scale(1.06) translate(1%, -1%);
+  }
+  50% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+@keyframes kenburnsC {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.1) translate(-1%, -2%);
+  }
+}
+.kenburns-a {
+  animation: kenburnsA 22s ease-in-out infinite;
+}
+.kenburns-b {
+  animation: kenburnsB 26s ease-in-out infinite;
+}
+.kenburns-c {
+  animation: kenburnsC 24s ease-in-out infinite;
+}
+
+/* Formes de fond qui dérivent très lentement, pour la profondeur */
+@keyframes driftSlow {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-18px, 14px) scale(1.05);
+  }
+}
+.hero-blob {
+  animation: driftSlow 28s ease-in-out infinite;
+}
+.hero-blob-slow {
+  animation: driftSlow 36s ease-in-out infinite reverse;
+}
+
+/* Étiquette promo flottante : légère oscillation continue */
+@keyframes badgeFloat {
+  0%,
+  100% {
+    transform: rotate(-6deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-6deg) translateY(-6px);
+  }
+}
+.promo-float {
+  animation: badgeFloat 3.4s ease-in-out infinite;
+}
+
+/* Fondu du texte quand la mise en avant du hero change */
+@keyframes heroTextFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero-text-fade {
+  animation: heroTextFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Bandeau défilant des promos */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 24s linear infinite;
+}
+
+/* Mode vitrine TV : transition slide + fondu entre chaque diapositive,
+   et zoom-out d'entrée sur l'image produit (effet catalogue premium) */
+@keyframes tvSlideFade {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tv-slide {
+  animation: tvSlideFade 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tvImageIn {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tv-image {
+  animation: tvImageIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Zoom lent et continu sur l'image produit pendant son affichage (Ken Burns) */
+@keyframes tvKenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+.tv-image img {
+  animation: tvKenburns 4.2s ease-out both;
+}
+
+@keyframes tvProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.tv-progress {
+  animation: tvProgress 3.8s linear both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .animate-rise {
     animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .img-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .kenburns-a,
+  .kenburns-b,
+  .kenburns-c {
+    animation: none;
+  }
+  .hero-blob,
+  .hero-blob-slow {
+    animation: none;
+  }
+  .promo-float {
+    animation: none;
+    transform: rotate(-6deg);
+  }
+  .hero-text-fade {
+    animation: none;
+  }
+  .animate-marquee {
+    animation: none;
+  }
+  .tv-slide {
+    animation: none;
+  }
+  .tv-image {
+    animation: none;
+  }
+  .tv-image img {
+    animation: none;
+  }
+  .tv-progress {
+    animation: none;
+    width: 100%;
   }
 }
 

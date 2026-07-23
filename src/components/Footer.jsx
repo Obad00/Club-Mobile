@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-brand-ink text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid gap-8 sm:grid-cols-3">
         <div>
-          <Logo className="[&_span]:text-white [&_span_span]:text-brand-red" />
+          <Logo size={44} textColorClass="text-white" />
           <p className="text-white/50 text-sm mt-3 max-w-xs">
             Votre boutique de téléphones, électroménager et accessoires à
             Dakar.
